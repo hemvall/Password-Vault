@@ -4,14 +4,14 @@ VAULT_FILE=".vault.gpg"
 TEMP_FILE="vault_temp.txt"
 LOG_FILE="vault_access.log"
 
-# Fonction pour supprimer temp même si crash ou ctrl+c
+# Delete temp (even in case of crash or ctrl+c)
 function clean_up {
     rm -f "$TEMP_FILE"
     exit
 }
 trap clean_up INT TERM EXIT
 
-# Crée un fichier vide chiffré si inexistant
+# Creates an empty file 
 if [[ ! -f "$VAULT_FILE" ]]; then
     whiptail --msgbox "Aucun coffre trouvé. Il va être créé." 8 40
     touch "$TEMP_FILE"
@@ -19,7 +19,7 @@ if [[ ! -f "$VAULT_FILE" ]]; then
     rm -f "$TEMP_FILE"
 fi
 
-# Déchiffre le vault dans un fichier temporaire
+# Decrypts vault in a temp file
 gpg --quiet --decrypt "$VAULT_FILE" > "$TEMP_FILE" 2>/dev/null
 
 while true; do
@@ -59,8 +59,7 @@ while true; do
     esac
 done
 
-# Rechiffre le fichier
+# Encrypt the file again 
 gpg --yes --batch --symmetric --output "$VAULT_FILE" "$TEMP_FILE"
 
-# Nettoyage géré automatiquement via trap
 exit 0
